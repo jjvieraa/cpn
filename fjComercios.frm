@@ -166,48 +166,60 @@ Attribute VB_Exposed = False
 
 '==================================================
 Private Sub Command1_Click()
+'MomeImportaDeudaAtrasadaAComercios
 '==================================================
+    'Creo que no se usa
     Screen.MousePointer = vbHourglass
-MomeImportaDeudaAtrtasadaAComercios
+    MomeImportaDeudaAtrtasadaAComercios
     Screen.MousePointer = vbDefault
 End Sub
 
+'==================================================
 Private Sub cmdFIn_Click()
-Unload Me
+'==================================================
+    Unload Me
 End Sub
 
+'==================================================
 Private Sub cmdPago_Click()
-DeshabilitaBotones
-Label2.Caption = "Hasta mes 10/mm/aaaa: "
-Label2.Visible = True
-Text1.Visible = True
-Text1.SetFocus
-kTipoListado = kPagos
-cmdVer.Visible = True
+'==================================================
+    DeshabilitaBotones
+    Label2.Caption = "Hasta mes 10/mm/aaaa: "
+    Label2.Visible = True
+    Text1.Visible = True
+    Text1.SetFocus
+    kTipoListado = kPagos
+    cmdVer.Visible = True
 End Sub
+
 '==================================================
 Private Sub cmdVer_Click()
 '==================================================
-Select Case kTipoListado
-    Case kListaTodos
-        ListaTodo
-    Case kListaUno
-        ListaUno
-    Case kPagos
-        fjPagoAComerc.Show
-End Select
-HabilitaBotones
+    Select Case kTipoListado
+        Case kListaTodos
+            ListaTodo
+        Case kListaUno
+            ListaUno
+        Case kPagos
+            fjPagoAComerc.Show
+    End Select
+    HabilitaBotones
 End Sub
 
 '==================================================
 Private Sub Form_Load()
 '==================================================
+    'si el mes de operacion es 1
+    'dFechaInicioEj = dia_que_vence_presupuesto + 1 /12 / AÃ±o_Operacion -1
+    ' si MesOperac=1, AÃ±oOperc=2020, DiaVencePresupuesto=8 --> dFechaInicioEj = 9/12/2019
+    'SINO MesOperac=6, AÃ±oOperc=2020, DiaVencePresupuesto=8 --> dFechaInicioEj = 9/5/2020
+    ' dFechaFinEj = 8/6/2020
    If vpbMesOperac = 1 Then
-            dFechaInicioEj = CDate(vpnPrspHst + 1 & "/12/" & vpnAñoOperac - 1)
+            dFechaInicioEj = CDate(vpnPrspHst + 1 & "/12/" & vpnAï¿½oOperac - 1)
     Else
-            dFechaInicioEj = CDate(vpnPrspHst + 1 & "/" & vpbMesOperac - 1 & "/" & vpnAñoOperac)
+            dFechaInicioEj = CDate(vpnPrspHst + 1 & "/" & vpbMesOperac - 1 & "/" & vpnAï¿½oOperac)
     End If
-    dFechaFinEj = CDate(vpnPrspHst & "/" & vpbMesOperac & "/" & vpnAñoOperac)
+    dFechaFinEj = CDate(vpnPrspHst & "/" & vpbMesOperac & "/" & vpnAï¿½oOperac)
     HabilitaBotones
 End Sub
 
@@ -229,6 +241,8 @@ Private Sub mCierraTodo()
     Label2.Visible = False
 
 End Sub
+
+
 '==================================================
 Private Sub mfGuardaComercio(lCom As Long, dFecha As Date, _
     sHaber As Single, lRecibo As Long, sDebe As Single)
@@ -254,179 +268,176 @@ End Sub
 '==================================================
 Private Sub cmdListaUno_Click()
 '==================================================
-DeshabilitaBotones
-Label2.Caption = "Hasta mes 10/mm/aaaa: "
-Label2.Visible = True
-Text1.Visible = True
-kTipoListado = kListaUno
-cmdVer.Visible = True
-Text1.SetFocus
-Label3.Visible = True
-Text2.Visible = True
-
+    DeshabilitaBotones
+    Label2.Caption = "Hasta mes 10/mm/aaaa: "
+    Label2.Visible = True
+    Text1.Visible = True
+    kTipoListado = kListaUno
+    cmdVer.Visible = True
+    Text1.SetFocus
+    Label3.Visible = True
+    Text2.Visible = True
 End Sub
+
+'==================================================
 Private Sub DeshabilitaBotones()
-cmd2Cierre.Enabled = False
-cmdListaTodo.Enabled = False
-cmdListaUno.Enabled = False
-cmdPago.Enabled = False
-cmdVer.Enabled = True
+'==================================================
+    cmd2Cierre.Enabled = False
+    cmdListaTodo.Enabled = False
+    cmdListaUno.Enabled = False
+    cmdPago.Enabled = False
+    cmdVer.Enabled = True
 End Sub
 
+'==================================================
 Private Sub HabilitaBotones()
-cmd2Cierre.Enabled = True
-cmdListaTodo.Enabled = True
-cmdListaUno.Enabled = True
-cmdPago.Enabled = True
-Text1.Visible = False
-Label2.Visible = False
-cmdVer.Visible = False
-PB.Visible = False
-Label3.Visible = False
-Text2.Visible = False
-cmdVer.Enabled = False
+'==================================================
+    cmd2Cierre.Enabled = True
+    cmdListaTodo.Enabled = True
+    cmdListaUno.Enabled = True
+    cmdPago.Enabled = True
+    Text1.Visible = False
+    Label2.Visible = False
+    cmdVer.Visible = False
+    PB.Visible = False
+    Label3.Visible = False
+    Text2.Visible = False
+    cmdVer.Enabled = False
 End Sub
+
+
 '==================================================
 Private Sub ListaUno()
 '==================================================
-     Dim cn As New ADODB.Connection
-    Dim sM As String
-    Dim nM As Long
-    
-    
+        Dim cn As New ADODB.Connection
+        Dim sM As String
+        Dim nM As Long
+        
+        
 
-    Screen.MousePointer = vbHourglass
-    Mensaje24 "Archivos..."
+        Screen.MousePointer = vbHourglass
+        Mensaje24 "Archivos..."
+        
+        
+        '1) CARGA LOS REGISTROS
+        Set cn = New ADODB.Connection
+        cn.CursorLocation = adUseClient
+        cn.Provider = "MSDATASHAPE"
+        cn.Open "dsn=jimmy"
+        sM = "SELECT *, NombCom & ' ' & Codigo & space(15) & ' Telf.' & tel as B3, d_haber - d_dscto - d_debe as b4,d_haber - d_debe as b5  FROM tbl_DeudComerc as T1 " & _
+                "INNER JOIN tbl_comercios as T2 " & _
+                "ON T2.codigo = T1.D_Comercio " & _
+                "WHERE d_Comercio=" & CLng(Text2.Text) & _
+            " AND NOT d_FVto > #" & _
+                mfInvierteMes(CStr(Text1.Text)) & "# AND " & _
+                "d_Recibo < 6  AND NOT d_cerro AND abs(d_haber - d_dscto - d_debe) >2 ORDER BY d_Comercio, d_Orden, d_FVto;"
+        
     
-    
-    '1) CARGA LOS REGISTROS
-    Set cn = New ADODB.Connection
-    cn.CursorLocation = adUseClient
-    cn.Provider = "MSDATASHAPE"
-    cn.Open "dsn=jimmy"
-      sM = "SELECT *, NombCom & ' ' & Codigo & space(15) & ' Telf.' & tel as B3, d_haber - d_dscto - d_debe as b4,d_haber - d_debe as b5  FROM tbl_DeudComerc as T1 " & _
-            "INNER JOIN tbl_comercios as T2 " & _
-            "ON T2.codigo = T1.D_Comercio " & _
-            "WHERE d_Comercio=" & CLng(Text2.Text) & _
-           " AND NOT d_FVto > #" & _
-            mfInvierteMes(CStr(Text1.Text)) & "# AND " & _
-            "d_Recibo < 6  AND NOT d_cerro AND abs(d_haber - d_dscto - d_debe) >2 ORDER BY d_Comercio, d_Orden, d_FVto;"
-    
-   
-    With adoCmd
-        .ActiveConnection = cn
-        .CommandType = adCmdText
-        .CommandText = "SHAPE {" & sM & "}  AS cm1 COMPUTE cm1 BY 'b3'"
-        .Execute
-    End With
-    
-    If adoM.State = adStateOpen Then adoM.Close
-    With adoM
-        .ActiveConnection = cn
-        .CursorLocation = adUseClient
-        .CursorType = adOpenDynamic
-        .LockType = adLockOptimistic
-        .Open adoCmd
-    End With
-    'Set adoQ = adoM(0).Value
-    If adoM.RecordCount < 0 Then
-        MsgBox "Sin Registros"
-        GoTo final2
-    End If
-    'Set fjMome.fdg1.DataSource = adoM
-    'Set fjMome.DataGrid1.DataSource = adoM
-    'fjMome.Show
-    'Exit Sub
-    Mensaje24 "Preparando Listado..."
-    'adoM.Filter = "cm1.B4 > 5"
-    
-    
-    '9) Muestra el informe de datos
-    dr2Comercios.Hide
-    dr2Comercios.Caption = "Resumen de Ordenes por Comercios al " & Text1.Text
-    dr2Comercios.Title = "Resumen de Ordenes por Comercios" & vbCrLf & "al " & Text1.Text
-    Set dr2Comercios.DataSource = adoM
-    dr2Comercios.DataMember = ""
-    
-    'GRUPO
-    dr2Comercios.Sections(3).Controls(1).DataMember = ""
-    dr2Comercios.Sections(3).Controls(1).DataField = "b3"
-    
-    'DETALLES
-    dr2Comercios.Sections(4).Controls(1).DataMember = "cm1"
-    dr2Comercios.Sections(4).Controls(1).DataField = "d_Orden"
-    dr2Comercios.Sections(4).Controls(2).DataMember = "cm1"
-    dr2Comercios.Sections(4).Controls(2).DataField = "d_FVto"
-    dr2Comercios.Sections(4).Controls(3).DataMember = "cm1"
-    dr2Comercios.Sections(4).Controls(3).DataField = "b5"
-    dr2Comercios.Sections(4).Controls(4).DataMember = "cm1"
-    dr2Comercios.Sections(4).Controls(4).DataField = "d_Dscto"
-    dr2Comercios.Sections(4).Controls(5).DataMember = "cm1"
-    dr2Comercios.Sections(4).Controls(5).DataField = "d_NoC"
-    dr2Comercios.Sections(4).Controls(6).DataMember = "cm1"
-    dr2Comercios.Sections(4).Controls(6).DataField = "d_plan"
-    dr2Comercios.Sections(4).Controls(7).DataMember = "cm1"
-    dr2Comercios.Sections(4).Controls(7).DataField = "B4"           'COMERCIO
-    
-    'PIE DE GRUPO
-    'dr2comercios.Sections(5).Controls(1).DataMember = ""
-    'dr2comercios.Sections(5).Controls(1).DataField = "i_sNombre"
-    dr2Comercios.Sections(5).Controls(1).DataMember = "cm1"
-    dr2Comercios.Sections(5).Controls(1).DataField = "b5"
-    dr2Comercios.Sections(5).Controls(2).DataMember = "cm1"
-    dr2Comercios.Sections(5).Controls(2).DataField = "d_Dscto"
-    dr2Comercios.Sections(5).Controls(3).DataMember = "cm1"
-    dr2Comercios.Sections(5).Controls(3).DataField = "b4"
-    'dr2comercios.Sections(5).Controls(3).DataMember = "tbl_Info01"
-    'dr2comercios.Sections(5).Controls(3).DataField = "ord_meCuota"
-     
-     'PIE DE INFORME
-'dr2Comercios.Sections(7).Controls(1).DataMember = "cm1"
- '   dr2Comercios.Sections(7).Controls(1).DataField = "d_haber"
- '   dr2Comercios.Sections(7).Controls(2).DataMember = "cm1"
- '   dr2Comercios.Sections(7).Controls(2).DataField = "d_dscto"
- '   dr2Comercios.Sections(7).Controls(3).DataMember = "cm1"
- '   dr2Comercios.Sections(7).Controls(3).DataField = "b4"
+        With adoCmd
+            .ActiveConnection = cn
+            .CommandType = adCmdText
+            .CommandText = "SHAPE {" & sM & "}  AS cm1 COMPUTE cm1 BY 'b3'"
+            .Execute
+        End With
+        
+        If adoM.State = adStateOpen Then adoM.Close
+        With adoM
+            .ActiveConnection = cn
+            .CursorLocation = adUseClient
+            .CursorType = adOpenDynamic
+            .LockType = adLockOptimistic
+            .Open adoCmd
+        End With
+        'Set adoQ = adoM(0).Value
+        If adoM.RecordCount < 0 Then
+            MsgBox "Sin Registros"
+            GoTo final2
+        End If
+        'Set fjMome.fdg1.DataSource = adoM
+        'Set fjMome.DataGrid1.DataSource = adoM
+        'fjMome.Show
+        'Exit Sub
+        Mensaje24 "Preparando Listado..."
+        'adoM.Filter = "cm1.B4 > 5"
+        
+        
+        '9) Muestra el informe de datos
+        dr2Comercios.Hide
+        dr2Comercios.Caption = "Resumen de Ordenes por Comercios al " & Text1.Text
+        dr2Comercios.Title = "Resumen de Ordenes por Comercios" & vbCrLf & "al " & Text1.Text
+        Set dr2Comercios.DataSource = adoM
+        dr2Comercios.DataMember = ""
+        
+        'GRUPO
+        dr2Comercios.Sections(3).Controls(1).DataMember = ""
+        dr2Comercios.Sections(3).Controls(1).DataField = "b3"
+        
+        'DETALLES
+        dr2Comercios.Sections(4).Controls(1).DataMember = "cm1"
+        dr2Comercios.Sections(4).Controls(1).DataField = "d_Orden"
+        dr2Comercios.Sections(4).Controls(2).DataMember = "cm1"
+        dr2Comercios.Sections(4).Controls(2).DataField = "d_FVto"
+        dr2Comercios.Sections(4).Controls(3).DataMember = "cm1"
+        dr2Comercios.Sections(4).Controls(3).DataField = "b5"
+        dr2Comercios.Sections(4).Controls(4).DataMember = "cm1"
+        dr2Comercios.Sections(4).Controls(4).DataField = "d_Dscto"
+        dr2Comercios.Sections(4).Controls(5).DataMember = "cm1"
+        dr2Comercios.Sections(4).Controls(5).DataField = "d_NoC"
+        dr2Comercios.Sections(4).Controls(6).DataMember = "cm1"
+        dr2Comercios.Sections(4).Controls(6).DataField = "d_plan"
+        dr2Comercios.Sections(4).Controls(7).DataMember = "cm1"
+        dr2Comercios.Sections(4).Controls(7).DataField = "B4"           'COMERCIO
+        
+        'PIE DE GRUPO
+        'dr2comercios.Sections(5).Controls(1).DataMember = ""
+        'dr2comercios.Sections(5).Controls(1).DataField = "i_sNombre"
+        dr2Comercios.Sections(5).Controls(1).DataMember = "cm1"
+        dr2Comercios.Sections(5).Controls(1).DataField = "b5"
+        dr2Comercios.Sections(5).Controls(2).DataMember = "cm1"
+        dr2Comercios.Sections(5).Controls(2).DataField = "d_Dscto"
+        dr2Comercios.Sections(5).Controls(3).DataMember = "cm1"
+        dr2Comercios.Sections(5).Controls(3).DataField = "b4"
+        'dr2comercios.Sections(5).Controls(3).DataMember = "tbl_Info01"
+        'dr2comercios.Sections(5).Controls(3).DataField = "ord_meCuota"
+        
+        'PIE DE INFORME
+    'dr2Comercios.Sections(7).Controls(1).DataMember = "cm1"
+    '   dr2Comercios.Sections(7).Controls(1).DataField = "d_haber"
+    '   dr2Comercios.Sections(7).Controls(2).DataMember = "cm1"
+    '   dr2Comercios.Sections(7).Controls(2).DataField = "d_dscto"
+    '   dr2Comercios.Sections(7).Controls(3).DataMember = "cm1"
+    '   dr2Comercios.Sections(7).Controls(3).DataField = "b4"
 
-    'dr2comercios.Sections(7).Controls(2).DataMember = "tbl_Info01"
-    'dr2comercios.Sections(7).Controls(2).DataField = "ord_meCuota"
-    
-    dr2Comercios.Refresh
-    Screen.MousePointer = vbDefault
-    DoEvents
-    dr2Comercios.Show    'Set fjMome.fdg1.DataSource = adoM
-    'Set fjMome.DataGrid1.DataSource = adoM
-    'fjMome.Show
-    'Exit Sub
-final2:
-mCierraTodo
-   
-
+        'dr2comercios.Sections(7).Controls(2).DataMember = "tbl_Info01"
+        'dr2comercios.Sections(7).Controls(2).DataField = "ord_meCuota"
+        
+        dr2Comercios.Refresh
+        Screen.MousePointer = vbDefault
+        DoEvents
+        dr2Comercios.Show    'Set fjMome.fdg1.DataSource = adoM
+        'Set fjMome.DataGrid1.DataSource = adoM
+        'fjMome.Show
+        'Exit Sub
+    final2:
+    mCierraTodo
 End Sub
+
 '==================================================
 Private Sub cmdListaTodo_Click()
 '==================================================
-DeshabilitaBotones
-Label2.Caption = "Hasta mes 10/mm/aaaa: "
-Label2.Visible = True
-Text1.Visible = True
-kTipoListado = kListaTodos
-cmdVer.Visible = True
-Text1.SetFocus
-
-    
-    
-   
+    DeshabilitaBotones
+    Label2.Caption = "Hasta mes 10/mm/aaaa: "
+    Label2.Visible = True
+    Text1.Visible = True
+    kTipoListado = kListaTodos
+    cmdVer.Visible = True
+    Text1.SetFocus  
 End Sub
 
 
 '==================================================
 Private Sub ListaTodo()
 '==================================================
-    
-    
-    
-    
     Dim cn As New ADODB.Connection
     Dim sM As String
     Dim nM As Long
@@ -534,69 +545,18 @@ Private Sub ListaTodo()
     'Set fjMome.DataGrid1.DataSource = adoM
     'fjMome.Show
     'Exit Sub
-final2:
-mCierraTodo
+    final2:
+    mCierraTodo
 
 End Sub
 
 
 
-'==================================================
-Private Sub msLlenaUnRegDeInfo01()
-'==================================================
-Dim sPorc As Single
-Dim sValor As Single
-Dim sDcto As Single
-adoQ.AddNew
-adoQ("ord_NroOrden") = adoP("ord_NroOrden")
-adoQ("ord_NroSoc") = adoP("ord_NroSoc")
-adoQ("ord_NroCom") = adoP("ord_NroCom")
-adoQ("Ord_FEmis") = adoP("ord_femis")
-adoM.MoveFirst
-adoM.Find ("Codigo =" & adoP("ord_NroCom"))
-If Not adoM.EOF Then
-    adoQ("i_sNombre") = adoM("NombCOm")
-    sPorc = 0 + adoM("desc")
-Else
-    adoQ("i_sNombre") = "Desconocido"
-    sPorc = 0
-End If
-sValor = adoP("ord_cuota") * adoP("ord_plan")
-adoQ("Ord_Cuota") = sValor
-sDcto = sValor * sPorc / 100        ' el descuento sobre el valor
-adoQ("ord_recarg") = sDcto      'en recargo queda el descuento
-adoQ("ord_entCta") = sValor - sDcto 'en ent cta queda el total
-If Not adoP("ord_Mon") = "P" Then
-    adoQ("i_sM1") = Format(adoP("ord_MECuota") * adoP("ord_plan"), "#,#0.00")
-End If
-
-adoQ.Update
-End Sub
 
 
 '==================================================
-Private Sub ms2LlenaUnRegDeInfo01(sPorc As Single)
-'==================================================
-Dim sValor As Single
-Dim sDcto As Single
-adoQ.AddNew
-adoQ("ord_NroOrden") = adoP("ord_NroOrden")
-adoQ("ord_NroSoc") = adoP("ord_NroSoc")
-adoQ("ord_NroCom") = adoP("ord_NroCom")
-adoQ("Ord_FEmis") = adoP("ord_femis")
-sValor = adoP("ord_cuota") * adoP("ord_plan")
-adoQ("Ord_Cuota") = sValor
-sDcto = sValor * sPorc / 100        ' el descuento sobre el valor
-adoQ("ord_recarg") = sDcto      'en recargo queda el descuento
-adoQ("ord_entCta") = sValor - sDcto 'en ent cta queda el total
-If Not adoP("ord_Mon") = "P" Then
-    adoQ("i_sM1") = Format(adoP("ord_MECuota") * adoP("ord_plan"), "#,#0.00")
-End If
-
-adoQ.Update
-End Sub
-
 Private Sub Text1_change()
+'==================================================
         If Len(Text1.Text) = 2 Then
             Text1.Text = Text1.Text & "/"
             Text1.SelStart = 3
@@ -627,6 +587,8 @@ Private Sub Text1_Validate(Cancel As Boolean)
 '==================================================
         If Not IsDate(Text1.Text) Then Cancel = True
 End Sub
+
+
 '==================================================
 Private Sub Text2_Validate(Cancel As Boolean)
 '==================================================
@@ -638,7 +600,7 @@ End Sub
 '==================================================
 Private Sub cmdMome_Click()
 '==================================================
-'es solo un ejemplo de un listado sin uso de tabla
+    'es solo un ejemplo de un listado sin uso de tabla
     Dim cn As New ADODB.Connection
     Dim sM As String
     Dim nM As Long
@@ -726,8 +688,8 @@ Private Sub cmdMome_Click()
     'drMome.Refresh
  
     'drMome.Show
-final2:
-mCierraTodo
+    final2:
+    mCierraTodo
 End Sub
 
 
@@ -736,25 +698,25 @@ End Sub
 Private Sub cmd2Cierre_Click()
 '==================================================
     If vpnNivelFuncionario < kNivel6 Then
-        MsgBox "Sin Autorización"
+        MsgBox "Sin Autorizaciï¿½n"
        Exit Sub
     End If
     PB.Visible = True
     DeshabilitaBotones
     Screen.MousePointer = vbHourglass
-'0) Si mes presupuesto es 201503 pone: se toman ordenes entre el 7/2/2015 y el 6/3/2015
-'Toma el presupuesto y el dia de vencimiento de la tblParametros
+    '0) Si mes presupuesto es 201503 pone: se toman ordenes entre el 7/2/2015 y el 6/3/2015
+    'Toma el presupuesto y el dia de vencimiento de la tblParametros
   Dim sMo As String
-  sMo = "Continúa el cierre ?" & vbCrLf & _
-            "Si continúa, se realizan las siguientes acciones: " & vbCrLf & _
+  sMo = "Continï¿½a el cierre ?" & vbCrLf & _
+            "Si continï¿½a, se realizan las siguientes acciones: " & vbCrLf & _
             "Se toman las ordenes generadas entre " & dFechaInicioEj & _
             " y " & dFechaFinEj & vbCrLf & " y se inserta en tbl_DeudComerc " & _
             "un registro por cada cuota" & vbCrLf
     If MsgBox(sMo, vbYesNo + vbQuestion, "Cierre Mes Comercios!") = vbNo Then
                 GoTo termina
           End If
-'1) Verifica que mes anterior este cerrado en tbl_accion
-'que en tbl_accion accion=26 nroident=presupuesto anterior (201502)
+    '1) Verifica que mes anterior este cerrado en tbl_accion
+    'que en tbl_accion accion=26 nroident=presupuesto anterior (201502)
     Mensaje24 "7.Verifica Mes Anterior..."
     If Not rCierraMes_VerifMesAnteriorEsteCompleto(6) Then
           If MsgBox("Cancela el cierre ?", vbYesNo + vbQuestion, "Mes Anterior Incompleto!") = vbYes Then
@@ -762,8 +724,8 @@ Private Sub cmd2Cierre_Click()
           End If
     End If
     
-'2) Verifica que ya no se haya cerrado el mes anteriormente
-' que NO ESTE en tbl_accion accion=26 nroident=presupuesto (201503)
+    '2) Verifica que ya no se haya cerrado el mes anteriormente
+    ' que NO ESTE en tbl_accion accion=26 nroident=presupuesto (201503)
     Dim sM As String
     Mensaje24 "6.Verificando repeticion..."
     If Not rCierraMes_VerifMesEsteCompleto(6) Then
@@ -779,27 +741,27 @@ Private Sub cmd2Cierre_Click()
           End If
     End If
 
-'3) toma la tasa de cambio del dia
-Mensaje24 "Las TC deben ser distintas de cero"
+    '3) toma la tasa de cambio del dia
+    Mensaje24 "Las TC deben ser distintas de cero"
 
-Screen.MousePointer = vbDefault
-sTCDolar = 0
-Do While sTCDolar = 0
-    sTCDolar = cTC.mfDevuelveCambio("D", dFechaFinEj)
-Loop
-sTCReal = 0
-Do While sTCReal = 0
-    sTCReal = cTC.mfDevuelveCambio("R", dFechaFinEj)
-Loop
-sTCAus = 0
-Do While sTCAus = 0
-    sTCAus = cTC.mfDevuelveCambio("A", dFechaFinEj)
-Loop
-Screen.MousePointer = vbHourglass
+    Screen.MousePointer = vbDefault
+    sTCDolar = 0
+    Do While sTCDolar = 0
+        sTCDolar = cTC.mfDevuelveCambio("D", dFechaFinEj)
+    Loop
+    sTCReal = 0
+    Do While sTCReal = 0
+        sTCReal = cTC.mfDevuelveCambio("R", dFechaFinEj)
+    Loop
+    sTCAus = 0
+    Do While sTCAus = 0
+        sTCAus = cTC.mfDevuelveCambio("A", dFechaFinEj)
+    Loop
+    Screen.MousePointer = vbHourglass
 
 
-'4) Genera el ado: 1 registro por cuota
-' y con D_recibo=5
+    '4) Genera el ado: 1 registro por cuota
+    ' y con D_recibo=5
     
     Mensaje24 "5.Genera Ado..."
     
@@ -834,8 +796,8 @@ Screen.MousePointer = vbHourglass
     Loop
 
     
-'4) Coloca registros por la cuota mensual
-'1 registro por comercio cooperador con recibo=6
+    '4) Coloca registros por la cuota mensual
+    '1 registro por comercio cooperador con recibo=6
     If adoP.State = adStateOpen Then adoP.Close
     adoP.Open "SELECT * FROM tbl_Comercios;", adoConn, adOpenKeyset, adLockOptimistic, adCmdText
     PB.Min = 0
@@ -856,8 +818,8 @@ Screen.MousePointer = vbHourglass
     Loop
     adoM.UpdateBatch adAffectAllChapters
 
-'5) actualiza las cuotas en ME
-'iy marcA las cerradas
+    '5) actualiza las cuotas en ME
+    'iy marcA las cerradas
     If adoP.State = adStateOpen Then adoP.Close
     adoP.Open "SELECT * FROM tbl_DeudComerc WHERE NOT d_cerro;", adoConn, adOpenKeyset, adLockOptimistic, adCmdText
     PB.Min = 0
@@ -887,13 +849,13 @@ Screen.MousePointer = vbHourglass
     adoM.UpdateBatch adAffectAllChapters
 
    
-'5) Pone marca en tbl_accion
+    '5) Pone marca en tbl_accion
     Mensaje24 "1.Marca..."
     If Not fColocaMarcaAccion(26, vptMesPresup, "Cierre Comercio", "", "") Then
-            MsgBox "Error 24233: No se completó marca de Cierre"
+            MsgBox "Error 24233: No se completï¿½ marca de Cierre"
     End If
-HabilitaBotones
-termina:
+    HabilitaBotones
+    termina:
     mCierraTodo
 End Sub
   
@@ -901,58 +863,59 @@ End Sub
 '==================================================
 Private Sub mf2GuardaComercio(nPlan As Byte)
 '==================================================
-Dim dMome As Date
-Dim sValor As Single
-Dim sValorME As Single
-Dim sDesc As Single
+    Dim dMome As Date
+    Dim sValor As Single
+    Dim sValorME As Single
+    Dim sDesc As Single
 
-'If adoP("ord_NroOrden") = 5467 Then
-'    sValor = 0
-'End If
+    'If adoP("ord_NroOrden") = 5467 Then
+    '    sValor = 0
+    'End If
 
-If nPlan > 1 Then
-    dMome = mfAgregaMesesAFecha(adoP("ord_FVto"), nPlan - 1)
-Else
-    dMome = adoP("ord_FVto")
-End If
-If adoP("ord_Mon") = "P" Then
-    sValor = adoP("ord_cuota")
-    sValorME = 0
-Else
-    Select Case adoP("ord_Mon")
-        Case "D"
-            sValor = adoP("ord_MECuota") * sTCDolar
-          Case "R"
-            sValor = adoP("ord_MECuota") * sTCReal
-       Case "A"
-            sValor = adoP("ord_MECuota") * sTCAus
-       Case Else
-            sValor = adoP("ord_mecuota")
-  End Select
- sValorME = adoP("ord_mecuota")
-End If
-sDesc = 0 + adoP("desc")
+    If nPlan > 1 Then
+        dMome = mfAgregaMesesAFecha(adoP("ord_FVto"), nPlan - 1)
+    Else
+        dMome = adoP("ord_FVto")
+    End If
+    If adoP("ord_Mon") = "P" Then
+        sValor = adoP("ord_cuota")
+        sValorME = 0
+    Else
+        Select Case adoP("ord_Mon")
+            Case "D"
+                sValor = adoP("ord_MECuota") * sTCDolar
+            Case "R"
+                sValor = adoP("ord_MECuota") * sTCReal
+        Case "A"
+                sValor = adoP("ord_MECuota") * sTCAus
+        Case Else
+                sValor = adoP("ord_mecuota")
+    End Select
+    sValorME = adoP("ord_mecuota")
+    End If
+    sDesc = 0 + adoP("desc")
 
-adoCmd.CommandText = "insert into tbl_DeudComerc " & _
-"(d_comercio,d_Clie, d_orden, d_fecha, d_Recibo, d_Debe, d_haber, d_deta, " & _
-"d_plan, d_NoC,  d_FVto, d_Mone, d_ValorME, d_Dscto, d_Func, d_FDia, d_fHora) " & _
-"values ('" & _
-    adoP("ord_NroCom") & "','" & _
-    adoP("ord_NroSoc") & "','" & _
-    adoP("ord_NroOrden") & "','" & _
-    dFechaFinEj & _
-    "','5' , '0','" & sValor & "','','" & _
-    adoP("ord_plan") & "','" & nPlan & "','" & _
-    dMome & "','" & adoP("ord_mon") & "','" & sValorME & _
-    "','" & sValor * sDesc / 100 & "','" & vpnFuncionario & _
-    "','" & Date & "','" & Time & "')"
-adoCmd.Execute
+    adoCmd.CommandText = "insert into tbl_DeudComerc " & _
+    "(d_comercio,d_Clie, d_orden, d_fecha, d_Recibo, d_Debe, d_haber, d_deta, " & _
+    "d_plan, d_NoC,  d_FVto, d_Mone, d_ValorME, d_Dscto, d_Func, d_FDia, d_fHora) " & _
+    "values ('" & _
+        adoP("ord_NroCom") & "','" & _
+        adoP("ord_NroSoc") & "','" & _
+        adoP("ord_NroOrden") & "','" & _
+        dFechaFinEj & _
+        "','5' , '0','" & sValor & "','','" & _
+        adoP("ord_plan") & "','" & nPlan & "','" & _
+        dMome & "','" & adoP("ord_mon") & "','" & sValorME & _
+        "','" & sValor * sDesc / 100 & "','" & vpnFuncionario & _
+        "','" & Date & "','" & Time & "')"
+    adoCmd.Execute
 End Sub
 
 
 '==================================================
 Private Sub MomeImportaDeudaAtrtasadaAComercios()
 '==================================================
+    'Creo que no se usa
     If adoQ.State = adStateOpen Then adoQ.Close
     adoQ.Open "SELECT * FROM impComerc;", adoConn, adOpenKeyset, adLockOptimistic, adCmdText
     If adoM.State = adStateOpen Then adoM.Close
@@ -962,7 +925,7 @@ Private Sub MomeImportaDeudaAtrtasadaAComercios()
         mf5GuardaComercio
         adoQ.MoveNext
     Loop
-mCierraTodo
+    mCierraTodo
 End Sub
 
 
@@ -971,6 +934,7 @@ End Sub
 '==================================================
 Private Sub mf5GuardaComercio()
 '==================================================
+    'creo que no se usa
     adoM.AddNew
     adoM("d_comercio") = adoQ("cta_com")
     adoM("d_clie") = adoQ("cta_cli")
@@ -989,4 +953,153 @@ Private Sub mf5GuardaComercio()
     adoM.Update
 End Sub
 
+'==================================================
+Private Sub cmdMome_Click()
+'==================================================
+    'es solo un ejemplo de un listado sin uso de tabla
+    Dim cn As New ADODB.Connection
+    Dim sM As String
+    Dim nM As Long
+    
+    
+    PB.Visible = True
+    'Screen.MousePointer = vbHourglass
+    Mensaje24 "Archivos..."
+    
+    Set cn = New ADODB.Connection
+    cn.CursorLocation = adUseClient
+    cn.Provider = "MSDATASHAPE"
+    cn.Open "dsn=jimmy"
+    sM = "SELECT ord_NroCom,ord_NroOrden, ord_NroSoc, ord_Femis, " & _
+            "ord_Cuota*ord_plan as St1, ord_mon, ord_mecuota*ord_plan as St2, " & _
+            "ord_cuota, ord_recarg, ord_entcta," & _
+            "ord_tipo,space(3) as xx1, T2.Codigo, T2.NombCom,t2.Desc  FROM tbl_Ordenes as T1 " & _
+            "INNER JOIN tbl_comercios as T2 " & _
+            "ON T2.codigo = T1.ord_nrocom " & _
+            "WHERE ord_FEmis BETWEEN #" & _
+            mfInvierteMes(CStr(dFechaInicioEj)) & "# AND #" & _
+            mfInvierteMes(CStr(dFechaFinEj)) & "# AND " & _
+            "NOT ord_NroCom = 0 AND " & _
+            "NOT ord_tipo = 4  ORDER BY ord_NroCom,ord_NroOrden;"
 
+    With adoCmd
+        .ActiveConnection = cn
+        .CommandType = adCmdText
+        .CommandText = "SHAPE {" & sM & "}  AS cm1 COMPUTE cm1 BY 'ord_NroCom'"
+        .Execute
+    End With
+    
+    If adoM.State = adStateOpen Then adoM.Close
+
+    With adoM
+        .ActiveConnection = cn
+        .CursorLocation = adUseClient
+        .CursorType = adOpenDynamic
+        .LockType = adLockOptimistic
+        .Open adoCmd
+    End With
+    Set adoQ = adoM(0).Value
+    
+    'Set fjMome.fdg1.DataSource = adoM
+    'Set fjMome.DataGrid1.DataSource = adoM
+    'fjMome.Show
+    'Exit Sub
+    
+    Mensaje24 "Recorre Ado..."
+    PB.Min = 0
+    nM = 0
+    PB.Max = adoM.RecordCount
+  Dim rsvar As Variant
+  Dim sPorc As Single
+  Dim sDcto As Single
+    adoQ.MoveFirst
+    Do While Not adoM.EOF
+        'Debug.Print adoQ(0), adoQ(1)
+        nM = nM + 1
+        adoQ("ord_cuota") = adoQ("st1")
+        sPorc = 0 + adoQ("desc")
+        sDcto = adoQ("st1") * sPorc / 100        ' el descuento sobre el valor
+        adoQ("ord_recarg") = sDcto      'en recargo queda el descuento
+        adoQ("ord_entCta") = adoQ("st1") - sDcto 'en ent cta queda el total
+
+        If nM Mod 100 = 0 Then PB.Value = nM
+        adoM.MoveNext
+    Loop
+    Set fjMome.fdg1.DataSource = adoM
+    Set fjMome.DataGrid1.DataSource = adoQ
+    fjMome.Show
+    Exit Sub
+  
+   ' drComercios.Hide
+   ' Set drMome.DataSource = adoM
+   ' drMome.DataMember = ""
+    
+    'GRUPO
+   ' drMome.Sections(3).Controls(1).DataMember = ""
+    'drMome.Sections(3).Controls(1).DataField = "ord_NroCOm"
+    
+    'DETALLES
+    'drMome.Sections(4).Controls(1).DataMember = "cm1"
+    'drMome.Sections(4).Controls(1).DataField = adoQ(0).Name
+    'drMome.Refresh
+ 
+    'drMome.Show
+    final2:
+    mCierraTodo
+End Sub
+'==================================================
+Private Sub msLlenaUnRegDeInfo01()
+'==================================================
+    'creo que no se usa
+    Dim sPorc As Single
+    Dim sValor As Single
+    Dim sDcto As Single
+    adoQ.AddNew
+    adoQ("ord_NroOrden") = adoP("ord_NroOrden")
+    adoQ("ord_NroSoc") = adoP("ord_NroSoc")
+    adoQ("ord_NroCom") = adoP("ord_NroCom")
+    adoQ("Ord_FEmis") = adoP("ord_femis")
+    adoM.MoveFirst
+    adoM.Find ("Codigo =" & adoP("ord_NroCom"))
+    If Not adoM.EOF Then
+        adoQ("i_sNombre") = adoM("NombCOm")
+        sPorc = 0 + adoM("desc")
+    Else
+        adoQ("i_sNombre") = "Desconocido"
+        sPorc = 0
+    End If
+    sValor = adoP("ord_cuota") * adoP("ord_plan")
+    adoQ("Ord_Cuota") = sValor
+    sDcto = sValor * sPorc / 100        ' el descuento sobre el valor
+    adoQ("ord_recarg") = sDcto      'en recargo queda el descuento
+    adoQ("ord_entCta") = sValor - sDcto 'en ent cta queda el total
+    If Not adoP("ord_Mon") = "P" Then
+        adoQ("i_sM1") = Format(adoP("ord_MECuota") * adoP("ord_plan"), "#,#0.00")
+    End If
+
+    adoQ.Update
+End Sub
+
+
+'==================================================
+Private Sub ms2LlenaUnRegDeInfo01(sPorc As Single)
+'==================================================
+    'creo que no se usa
+    Dim sValor As Single
+    Dim sDcto As Single
+    adoQ.AddNew
+    adoQ("ord_NroOrden") = adoP("ord_NroOrden")
+    adoQ("ord_NroSoc") = adoP("ord_NroSoc")
+    adoQ("ord_NroCom") = adoP("ord_NroCom")
+    adoQ("Ord_FEmis") = adoP("ord_femis")
+    sValor = adoP("ord_cuota") * adoP("ord_plan")
+    adoQ("Ord_Cuota") = sValor
+    sDcto = sValor * sPorc / 100        ' el descuento sobre el valor
+    adoQ("ord_recarg") = sDcto      'en recargo queda el descuento
+    adoQ("ord_entCta") = sValor - sDcto 'en ent cta queda el total
+    If Not adoP("ord_Mon") = "P" Then
+        adoQ("i_sM1") = Format(adoP("ord_MECuota") * adoP("ord_plan"), "#,#0.00")
+    End If
+
+    adoQ.Update
+End Sub

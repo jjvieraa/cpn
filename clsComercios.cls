@@ -11,12 +11,17 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
- Option Explicit
+Option Explicit
+'*****************************
+'La clase COMERCIOS
+'*****************************
 Dim rstM As ADODB.Recordset
 Dim nOrden() As Integer
 Dim nTope As Integer
 Public nbCantRec As Byte
 
+
+'=====================================================================
 Public Function CargaGruposEnCombo(cPrm As ComboBox) As Boolean
     Dim i As Integer
     
@@ -44,23 +49,26 @@ Public Function CargaGruposEnCombo(cPrm As ComboBox) As Boolean
 End Function
 
 
+'=====================================================================  
 Public Function DevuelveNoRubro(nPrm As Integer) As Integer
-DevuelveNoRubro = nOrden(nPrm)
+    DevuelveNoRubro = nOrden(nPrm)
 End Function
 
 
+'=====================================================================
 Public Function DevuelveNoDelCombo(nPrm As Integer) As Integer
-Dim ni As Integer
-For ni = 0 To nTope - 1
-    If nOrden(ni) = nPrm Then
-        DevuelveNoDelCombo = ni
-        Exit Function
-    End If
-Next
-DevuelveNoDelCombo = 0
+    Dim ni As Integer
+    For ni = 0 To nTope - 1
+        If nOrden(ni) = nPrm Then
+            DevuelveNoDelCombo = ni
+            Exit Function
+        End If
+    Next
+    DevuelveNoDelCombo = 0
 End Function
 
 
+'=====================================================================
 Public Function BuscaComercio(lPrm As Long) As String
     Set rstM = New Recordset
     rstM.Open "SELECT * FROM tbl_comercios ORDER BY codigo;", adoconn, adOpenKeyset, adLockOptimistic, adCmdText
@@ -76,21 +84,24 @@ Public Function BuscaComercio(lPrm As Long) As String
     nbCantRec = rstM("CantRecib")
     BuscaComercio = rstM("NombCom")
 End Function
+
+
 '=====================================================================
 Public Function mfAbreTablaComercios() As Boolean
-'=====================================================================
-On Error GoTo mErr2234
-    Set rstM = New Recordset
-    If rstM.State = adStateOpen Then rstM.Close
-    rstM.Open "SELECT * FROM tbl_comercios ORDER BY codigo;", adoconn, adOpenKeyset, adLockOptimistic, adCmdText
-    mfAbreTablaComercios = True
-    Exit Function
-mErr2234:
-    MsgBox "ERROR b2234: " & Err.Description & " NE: " & Err.Number
-    mfAbreTablaComercios = True
+    '=====================================================================
+    On Error GoTo mErr2234
+        Set rstM = New Recordset
+        If rstM.State = adStateOpen Then rstM.Close
+        rstM.Open "SELECT * FROM tbl_comercios ORDER BY codigo;", adoconn, adOpenKeyset, adLockOptimistic, adCmdText
+        mfAbreTablaComercios = True
+        Exit Function
+    mErr2234:
+        MsgBox "ERROR b2234: " & Err.Description & " NE: " & Err.Number
+        mfAbreTablaComercios = True
 End Function
 
 
+'=====================================================================
 Public Function BuscaComercio2(lPrm As Long) As String
     If lPrm = 0 Then
         BuscaComercio2 = ""
