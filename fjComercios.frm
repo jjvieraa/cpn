@@ -164,37 +164,20 @@ Attribute VB_Exposed = False
 
 
 
-'==================================================
-Private Sub Command1_Click()
-'MomeImportaDeudaAtrasadaAComercios
-'==================================================
-    'Creo que no se usa
-    Screen.MousePointer = vbHourglass
-    MomeImportaDeudaAtrtasadaAComercios
-    Screen.MousePointer = vbDefault
-End Sub
 
 '==================================================
 Private Sub cmdFIn_Click()
 '==================================================
+'Descarga el formulario
     Unload Me
 End Sub
 
-'==================================================
-Private Sub cmdPago_Click()
-'==================================================
-    DeshabilitaBotones
-    Label2.Caption = "Hasta mes 10/mm/aaaa: "
-    Label2.Visible = True
-    Text1.Visible = True
-    Text1.SetFocus
-    kTipoListado = kPagos
-    cmdVer.Visible = True
-End Sub
 
 '==================================================
 Private Sub cmdVer_Click()
 '==================================================
+'Se inicia alguno de los listados: kListaTodos, 
+'kListaUno, kPagos( fjPagoAComerc.show )
     Select Case kTipoListado
         Case kListaTodos
             ListaTodo
@@ -209,6 +192,9 @@ End Sub
 '==================================================
 Private Sub Form_Load()
 '==================================================
+'llena las variables dFechaInicioEj y dFechaFinEj
+'fecha de comienzo y de finalización del ejercicio
+
     'si el mes de operacion es 1
     'dFechaInicioEj = dia_que_vence_presupuesto + 1 /12 / Año_Operacion -1
     ' si MesOperac=1, AñoOperc=2020, DiaVencePresupuesto=8 --> dFechaInicioEj = 9/12/2019
@@ -228,6 +214,8 @@ End Sub
 '==================================================
 Private Sub mCierraTodo()
 '==================================================
+'Cierra los ADOs y esconde text1 (Nro Comercio) 
+'y Label2 (Hasta mes:)
     Mensaje24 ""
     PB.Visible = False
     If adoP.State = adStateOpen Then adoP.Close
@@ -268,6 +256,8 @@ End Sub
 '==================================================
 Private Sub cmdListaUno_Click()
 '==================================================
+'Prepara el listado kListaPagos
+    'Pide hasta que mes se muestran los pagos
     DeshabilitaBotones
     Label2.Caption = "Hasta mes 10/mm/aaaa: "
     Label2.Visible = True
@@ -278,6 +268,35 @@ Private Sub cmdListaUno_Click()
     Label3.Visible = True
     Text2.Visible = True
 End Sub
+
+'==================================================
+Private Sub cmdListaTodo_Click()
+'==================================================
+'Prepara el listado kListaTodos
+    'Pide hasta que mes se muestran los pagos
+    DeshabilitaBotones
+    Label2.Caption = "Hasta mes 10/mm/aaaa: "
+    Label2.Visible = True
+    Text1.Visible = True
+    kTipoListado = kListaTodos
+    cmdVer.Visible = True
+    Text1.SetFocus  
+End Sub
+
+'==================================================
+Private Sub cmdPago_Click()
+'==================================================
+'Prepara el listado kPagos
+    'Pide hasta que mes se muestran los pagos
+    DeshabilitaBotones
+    Label2.Caption = "Hasta mes 10/mm/aaaa: "
+    Label2.Visible = True
+    Text1.Visible = True
+    Text1.SetFocus
+    kTipoListado = kPagos
+    cmdVer.Visible = True
+End Sub
+
 
 '==================================================
 Private Sub DeshabilitaBotones()
@@ -304,6 +323,10 @@ Private Sub HabilitaBotones()
     Text2.Visible = False
     cmdVer.Enabled = False
 End Sub
+
+
+
+
 
 
 '==================================================
@@ -420,18 +443,6 @@ Private Sub ListaUno()
         'Exit Sub
     final2:
     mCierraTodo
-End Sub
-
-'==================================================
-Private Sub cmdListaTodo_Click()
-'==================================================
-    DeshabilitaBotones
-    Label2.Caption = "Hasta mes 10/mm/aaaa: "
-    Label2.Visible = True
-    Text1.Visible = True
-    kTipoListado = kListaTodos
-    cmdVer.Visible = True
-    Text1.SetFocus  
 End Sub
 
 
@@ -915,7 +926,7 @@ End Sub
 '==================================================
 Private Sub MomeImportaDeudaAtrtasadaAComercios()
 '==================================================
-    'Creo que no se usa
+'Creo que no se usa
     If adoQ.State = adStateOpen Then adoQ.Close
     adoQ.Open "SELECT * FROM impComerc;", adoConn, adOpenKeyset, adLockOptimistic, adCmdText
     If adoM.State = adStateOpen Then adoM.Close
@@ -929,12 +940,10 @@ Private Sub MomeImportaDeudaAtrtasadaAComercios()
 End Sub
 
 
-
-
 '==================================================
 Private Sub mf5GuardaComercio()
 '==================================================
-    'creo que no se usa
+'creo que no se usa
     adoM.AddNew
     adoM("d_comercio") = adoQ("cta_com")
     adoM("d_clie") = adoQ("cta_cli")
@@ -956,7 +965,7 @@ End Sub
 '==================================================
 Private Sub cmdMome_Click()
 '==================================================
-    'es solo un ejemplo de un listado sin uso de tabla
+'es solo un ejemplo de un listado sin uso de tabla
     Dim cn As New ADODB.Connection
     Dim sM As String
     Dim nM As Long
@@ -1050,7 +1059,7 @@ End Sub
 '==================================================
 Private Sub msLlenaUnRegDeInfo01()
 '==================================================
-    'creo que no se usa
+'creo que no se usa
     Dim sPorc As Single
     Dim sValor As Single
     Dim sDcto As Single
@@ -1084,7 +1093,7 @@ End Sub
 '==================================================
 Private Sub ms2LlenaUnRegDeInfo01(sPorc As Single)
 '==================================================
-    'creo que no se usa
+'creo que no se usa
     Dim sValor As Single
     Dim sDcto As Single
     adoQ.AddNew
@@ -1102,4 +1111,14 @@ Private Sub ms2LlenaUnRegDeInfo01(sPorc As Single)
     End If
 
     adoQ.Update
+End Sub
+
+'==================================================
+Private Sub Command1_Click()
+'MomeImportaDeudaAtrasadaAComercios
+'==================================================
+'Creo que no se usa
+    Screen.MousePointer = vbHourglass
+    MomeImportaDeudaAtrtasadaAComercios
+    Screen.MousePointer = vbDefault
 End Sub
