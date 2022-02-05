@@ -162,7 +162,7 @@ Attribute VB_Exposed = False
     Const kPagos = 3
 
 
-
+'Probando
 
 
 '==================================================
@@ -568,6 +568,8 @@ End Sub
 '==================================================
 Private Sub Text1_change()
 '==================================================
+'Coloca barras / en una fecha para lograr el 
+        'formato dd/mm/año 
         If Len(Text1.Text) = 2 Then
             Text1.Text = Text1.Text & "/"
             Text1.SelStart = 3
@@ -581,6 +583,7 @@ End Sub
 '==================================================
 Private Sub text2_KeyDown(KeyCode As Integer, Shift As Integer)  'jv
 '==================================================
+'Pulsar F2 en los listados = muestra los comercios
     Select Case kTipoListado
         Case kPagos
         Case kListaTodos
@@ -596,6 +599,7 @@ End Sub
 '==================================================
 Private Sub Text1_Validate(Cancel As Boolean)
 '==================================================
+'verifca que es una fecha
         If Not IsDate(Text1.Text) Then Cancel = True
 End Sub
 
@@ -603,111 +607,15 @@ End Sub
 '==================================================
 Private Sub Text2_Validate(Cancel As Boolean)
 '==================================================
+'verifica que es un número
         If Not IsNumeric(Text2.Text) Then Cancel = True
 End Sub
-
-
-
-'==================================================
-Private Sub cmdMome_Click()
-'==================================================
-    'es solo un ejemplo de un listado sin uso de tabla
-    Dim cn As New ADODB.Connection
-    Dim sM As String
-    Dim nM As Long
-    
-    
-    PB.Visible = True
-    'Screen.MousePointer = vbHourglass
-    Mensaje24 "Archivos..."
-    
-    Set cn = New ADODB.Connection
-    cn.CursorLocation = adUseClient
-    cn.Provider = "MSDATASHAPE"
-    cn.Open "dsn=jimmy"
-    sM = "SELECT ord_NroCom,ord_NroOrden, ord_NroSoc, ord_Femis, " & _
-            "ord_Cuota*ord_plan as St1, ord_mon, ord_mecuota*ord_plan as St2, " & _
-            "ord_cuota, ord_recarg, ord_entcta," & _
-            "ord_tipo,space(3) as xx1, T2.Codigo, T2.NombCom,t2.Desc  FROM tbl_Ordenes as T1 " & _
-            "INNER JOIN tbl_comercios as T2 " & _
-            "ON T2.codigo = T1.ord_nrocom " & _
-            "WHERE ord_FEmis BETWEEN #" & _
-            mfInvierteMes(CStr(dFechaInicioEj)) & "# AND #" & _
-            mfInvierteMes(CStr(dFechaFinEj)) & "# AND " & _
-            "NOT ord_NroCom = 0 AND " & _
-            "NOT ord_tipo = 4  ORDER BY ord_NroCom,ord_NroOrden;"
-
-    With adoCmd
-        .ActiveConnection = cn
-        .CommandType = adCmdText
-        .CommandText = "SHAPE {" & sM & "}  AS cm1 COMPUTE cm1 BY 'ord_NroCom'"
-        .Execute
-    End With
-    
-    If adoM.State = adStateOpen Then adoM.Close
-
-    With adoM
-        .ActiveConnection = cn
-        .CursorLocation = adUseClient
-        .CursorType = adOpenDynamic
-        .LockType = adLockOptimistic
-        .Open adoCmd
-    End With
-    Set adoQ = adoM(0).Value
-    
-    'Set fjMome.fdg1.DataSource = adoM
-    'Set fjMome.DataGrid1.DataSource = adoM
-    'fjMome.Show
-    'Exit Sub
-    
-    Mensaje24 "Recorre Ado..."
-    PB.Min = 0
-    nM = 0
-    PB.Max = adoM.RecordCount
-  Dim rsvar As Variant
-  Dim sPorc As Single
-  Dim sDcto As Single
-    adoQ.MoveFirst
-    Do While Not adoM.EOF
-        'Debug.Print adoQ(0), adoQ(1)
-        nM = nM + 1
-        adoQ("ord_cuota") = adoQ("st1")
-        sPorc = 0 + adoQ("desc")
-        sDcto = adoQ("st1") * sPorc / 100        ' el descuento sobre el valor
-        adoQ("ord_recarg") = sDcto      'en recargo queda el descuento
-        adoQ("ord_entCta") = adoQ("st1") - sDcto 'en ent cta queda el total
-
-        If nM Mod 100 = 0 Then PB.Value = nM
-        adoM.MoveNext
-    Loop
-    Set fjMome.fdg1.DataSource = adoM
-    Set fjMome.DataGrid1.DataSource = adoQ
-    fjMome.Show
-    Exit Sub
-  
-   ' drComercios.Hide
-   ' Set drMome.DataSource = adoM
-   ' drMome.DataMember = ""
-    
-    'GRUPO
-   ' drMome.Sections(3).Controls(1).DataMember = ""
-    'drMome.Sections(3).Controls(1).DataField = "ord_NroCOm"
-    
-    'DETALLES
-    'drMome.Sections(4).Controls(1).DataMember = "cm1"
-    'drMome.Sections(4).Controls(1).DataField = adoQ(0).Name
-    'drMome.Refresh
- 
-    'drMome.Show
-    final2:
-    mCierraTodo
-End Sub
-
 
 
 '==================================================
 Private Sub cmd2Cierre_Click()
 '==================================================
+'Cierra el mes
     If vpnNivelFuncionario < kNivel6 Then
         MsgBox "Sin Autorizaci�n"
        Exit Sub
@@ -1121,4 +1029,99 @@ Private Sub Command1_Click()
     Screen.MousePointer = vbHourglass
     MomeImportaDeudaAtrtasadaAComercios
     Screen.MousePointer = vbDefault
+End Sub
+
+'==================================================
+Private Sub cmdMome_Click()
+'==================================================
+'es solo un ejemplo de un listado sin uso de tabla
+    Dim cn As New ADODB.Connection
+    Dim sM As String
+    Dim nM As Long
+    
+    
+    PB.Visible = True
+    'Screen.MousePointer = vbHourglass
+    Mensaje24 "Archivos..."
+    
+    Set cn = New ADODB.Connection
+    cn.CursorLocation = adUseClient
+    cn.Provider = "MSDATASHAPE"
+    cn.Open "dsn=jimmy"
+    sM = "SELECT ord_NroCom,ord_NroOrden, ord_NroSoc, ord_Femis, " & _
+            "ord_Cuota*ord_plan as St1, ord_mon, ord_mecuota*ord_plan as St2, " & _
+            "ord_cuota, ord_recarg, ord_entcta," & _
+            "ord_tipo,space(3) as xx1, T2.Codigo, T2.NombCom,t2.Desc  FROM tbl_Ordenes as T1 " & _
+            "INNER JOIN tbl_comercios as T2 " & _
+            "ON T2.codigo = T1.ord_nrocom " & _
+            "WHERE ord_FEmis BETWEEN #" & _
+            mfInvierteMes(CStr(dFechaInicioEj)) & "# AND #" & _
+            mfInvierteMes(CStr(dFechaFinEj)) & "# AND " & _
+            "NOT ord_NroCom = 0 AND " & _
+            "NOT ord_tipo = 4  ORDER BY ord_NroCom,ord_NroOrden;"
+
+    With adoCmd
+        .ActiveConnection = cn
+        .CommandType = adCmdText
+        .CommandText = "SHAPE {" & sM & "}  AS cm1 COMPUTE cm1 BY 'ord_NroCom'"
+        .Execute
+    End With
+    
+    If adoM.State = adStateOpen Then adoM.Close
+
+    With adoM
+        .ActiveConnection = cn
+        .CursorLocation = adUseClient
+        .CursorType = adOpenDynamic
+        .LockType = adLockOptimistic
+        .Open adoCmd
+    End With
+    Set adoQ = adoM(0).Value
+    
+    'Set fjMome.fdg1.DataSource = adoM
+    'Set fjMome.DataGrid1.DataSource = adoM
+    'fjMome.Show
+    'Exit Sub
+    
+    Mensaje24 "Recorre Ado..."
+    PB.Min = 0
+    nM = 0
+    PB.Max = adoM.RecordCount
+  Dim rsvar As Variant
+  Dim sPorc As Single
+  Dim sDcto As Single
+    adoQ.MoveFirst
+    Do While Not adoM.EOF
+        'Debug.Print adoQ(0), adoQ(1)
+        nM = nM + 1
+        adoQ("ord_cuota") = adoQ("st1")
+        sPorc = 0 + adoQ("desc")
+        sDcto = adoQ("st1") * sPorc / 100        ' el descuento sobre el valor
+        adoQ("ord_recarg") = sDcto      'en recargo queda el descuento
+        adoQ("ord_entCta") = adoQ("st1") - sDcto 'en ent cta queda el total
+
+        If nM Mod 100 = 0 Then PB.Value = nM
+        adoM.MoveNext
+    Loop
+    Set fjMome.fdg1.DataSource = adoM
+    Set fjMome.DataGrid1.DataSource = adoQ
+    fjMome.Show
+    Exit Sub
+  
+   ' drComercios.Hide
+   ' Set drMome.DataSource = adoM
+   ' drMome.DataMember = ""
+    
+    'GRUPO
+   ' drMome.Sections(3).Controls(1).DataMember = ""
+    'drMome.Sections(3).Controls(1).DataField = "ord_NroCOm"
+    
+    'DETALLES
+    'drMome.Sections(4).Controls(1).DataMember = "cm1"
+    'drMome.Sections(4).Controls(1).DataField = adoQ(0).Name
+    'drMome.Refresh
+ 
+    'drMome.Show
+    final2:
+    mCierraTodo
 End Sub
